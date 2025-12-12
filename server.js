@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const cors = require('cors');
+const { storeMeetingData } = require('./firebase-config.js');
+const { generateMeetingId, verifyMeetingId } = require('./meeting-id-generator.js');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,8 +11,6 @@ const server = http.createServer(app);
 // Configure CORS
 app.use(cors());
 app.use(express.json());
-
-
 
 // Socket.IO setup with CORS
 const io = socketIO(server, {
@@ -32,6 +32,25 @@ app.get('/health', (req, res) => {
     activeMeetings: meetings.size,
     activeParticipants: participants.size,
     activeCalls: activeCalls.size
+  });
+});
+
+// Generate secure meeting ID from appointment ID
+app.post('/generate-meeting-id', (req, res) => {
+  const { appointmentId } = req.body;
+  
+  if (!appointmentId) {
+    return res.status(400).json({ error: 'appointmentId is required' });
+  }
+  
+  const meetingId = generateMeetingId(appointmentId);
+  
+  console.log(`🔐 Generated meeting ID for appointment ${appointmentId}: ${meetingId}`);
+  
+  res.json({
+    appointmentId,
+    meetingId,
+    success: true
   });
 });
 
@@ -89,9 +108,12 @@ io.on('connection', (socket) => {
   });
 
   // Join a meeting room
-  socket.on('join-meeting', ({ meetingId, participantId, participantName, isHost }) => {
+  socket.on('join-meeting', ({ meetingId, participantId, participantName, isHost, appointmentId }) => {
     console.log(`\n👤 ${participantName} (${participantId}) joining meeting ${meetingId}`);
     console.log(`   Socket ID: ${socket.id}`);
+    if (appointmentId) {
+      console.log(`   📋 Appointment ID: ${appointmentId}`);
+    }
     
     // Join the Socket.IO room
     socket.join(meetingId);
@@ -105,12 +127,18 @@ io.on('connection', (socket) => {
       isHost,
       isAudioMuted: false,
       isVideoOff: false,
+      appointmentId: appointmentId || null,
     });
 
     // Add to meeting
     if (!meetings.has(meetingId)) {
       meetings.set(meetingId, new Set());
       console.log(`   📝 Created new meeting: ${meetingId}`);
+      
+      // Store meeting data in Firebase with appointment ID
+      storeMeetingData(meetingId, appointmentId).catch(err => {
+        console.error('Failed to store meeting data:', err);
+      });
     }
     meetings.get(meetingId).add(socket.id);
 
