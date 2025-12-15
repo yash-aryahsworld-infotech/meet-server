@@ -27,8 +27,13 @@ const activeCalls = new Map(); // Track active calls by appointment ID
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+<<<<<<< HEAD
   res.json({
     status: 'ok',
+=======
+  res.json({ 
+    status: 'ok', 
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     activeMeetings: meetings.size,
     activeParticipants: participants.size,
     activeCalls: activeCalls.size
@@ -38,6 +43,7 @@ app.get('/health', (req, res) => {
 // Generate secure meeting ID from appointment ID
 app.post('/generate-meeting-id', (req, res) => {
   const { appointmentId } = req.body;
+<<<<<<< HEAD
 
   if (!appointmentId) {
     return res.status(400).json({ error: 'appointmentId is required' });
@@ -47,6 +53,17 @@ app.post('/generate-meeting-id', (req, res) => {
 
   console.log(`🔐 Generated meeting ID for appointment ${appointmentId}: ${meetingId}`);
 
+=======
+  
+  if (!appointmentId) {
+    return res.status(400).json({ error: 'appointmentId is required' });
+  }
+  
+  const meetingId = generateMeetingId(appointmentId);
+  
+  console.log(`🔐 Generated meeting ID for appointment ${appointmentId}: ${meetingId}`);
+  
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
   res.json({
     appointmentId,
     meetingId,
@@ -58,7 +75,11 @@ app.post('/generate-meeting-id', (req, res) => {
 app.get('/call-status/:appointmentId', (req, res) => {
   const { appointmentId } = req.params;
   const callInfo = activeCalls.get(appointmentId);
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
   res.json({
     appointmentId,
     isActive: !!callInfo,
@@ -73,7 +94,11 @@ io.on('connection', (socket) => {
   // Start a call (doctor initiates)
   socket.on('start-call', ({ appointmentId, meetingId, doctorName }) => {
     console.log(`📞 Doctor ${doctorName} started call for appointment ${appointmentId}`);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Mark call as active
     activeCalls.set(appointmentId, {
       meetingId,
@@ -81,6 +106,7 @@ io.on('connection', (socket) => {
       startedAt: Date.now(),
       status: 'active'
     });
+<<<<<<< HEAD
 
     // Broadcast to all clients that this call is now active
     io.emit('call-started', { appointmentId, meetingId, doctorName });
@@ -88,6 +114,15 @@ io.on('connection', (socket) => {
     socket.emit('call-start-confirmed', { appointmentId, meetingId });
   });
 
+=======
+    
+    // Broadcast to all clients that this call is now active
+    io.emit('call-started', { appointmentId, meetingId, doctorName });
+    
+    socket.emit('call-start-confirmed', { appointmentId, meetingId });
+  });
+  
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
   // Check if call is active
   socket.on('check-call-status', ({ appointmentId }) => {
     const callInfo = activeCalls.get(appointmentId);
@@ -97,12 +132,20 @@ io.on('connection', (socket) => {
       callInfo: callInfo || null
     });
   });
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
   // End a call
   socket.on('end-call', ({ appointmentId }) => {
     console.log(`📞 Call ended for appointment ${appointmentId}`);
     activeCalls.delete(appointmentId);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Broadcast to all clients that this call has ended
     io.emit('call-ended', { appointmentId });
   });
@@ -114,10 +157,17 @@ io.on('connection', (socket) => {
     if (appointmentId) {
       console.log(`   📋 Appointment ID: ${appointmentId}`);
     }
+<<<<<<< HEAD
 
     // Join the Socket.IO room
     socket.join(meetingId);
 
+=======
+    
+    // Join the Socket.IO room
+    socket.join(meetingId);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Store participant info
     participants.set(socket.id, {
       socketId: socket.id,
@@ -134,7 +184,11 @@ io.on('connection', (socket) => {
     if (!meetings.has(meetingId)) {
       meetings.set(meetingId, new Set());
       console.log(`   📝 Created new meeting: ${meetingId}`);
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Store meeting data in Firebase with appointment ID
       storeMeetingData(meetingId, appointmentId).catch(err => {
         console.error('Failed to store meeting data:', err);
@@ -145,7 +199,11 @@ io.on('connection', (socket) => {
     // Notify others in the room
     const roomSize = meetings.get(meetingId).size;
     console.log(`   👥 Meeting ${meetingId} now has ${roomSize} participant(s)`);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     socket.to(meetingId).emit('participant-joined', {
       participantId,
       participantName,
@@ -156,6 +214,7 @@ io.on('connection', (socket) => {
     const currentParticipants = Array.from(meetings.get(meetingId))
       .map(sid => participants.get(sid))
       .filter(p => p && p.socketId !== socket.id);
+<<<<<<< HEAD
 
     // If this is a host (doctor) joining and there are already participants, emit doctor-rejoined
     if (isHost && currentParticipants.length > 0) {
@@ -170,6 +229,12 @@ io.on('connection', (socket) => {
     console.log(`   📤 Sending ${currentParticipants.length} existing participant(s) to ${participantName}`);
     socket.emit('existing-participants', currentParticipants);
 
+=======
+    
+    console.log(`   📤 Sending ${currentParticipants.length} existing participant(s) to ${participantName}`);
+    socket.emit('existing-participants', currentParticipants);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Log all participants in this meeting
     console.log(`   📋 All participants in ${meetingId}:`);
     Array.from(meetings.get(meetingId)).forEach(sid => {
@@ -184,11 +249,19 @@ io.on('connection', (socket) => {
   socket.on('offer', ({ meetingId, toParticipantId, offer }) => {
     const sender = participants.get(socket.id);
     console.log(`Offer from ${sender?.participantName} to ${toParticipantId}`);
+<<<<<<< HEAD
 
     // Find the target participant's socket
     const targetSocket = Array.from(participants.entries())
       .find(([_, p]) => p.participantId === toParticipantId);
 
+=======
+    
+    // Find the target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === toParticipantId);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     if (targetSocket) {
       io.to(targetSocket[0]).emit('offer', {
         fromParticipantId: sender.participantId,
@@ -202,11 +275,19 @@ io.on('connection', (socket) => {
   socket.on('answer', ({ meetingId, toParticipantId, answer }) => {
     const sender = participants.get(socket.id);
     console.log(`Answer from ${sender?.participantName} to ${toParticipantId}`);
+<<<<<<< HEAD
 
     // Find the target participant's socket
     const targetSocket = Array.from(participants.entries())
       .find(([_, p]) => p.participantId === toParticipantId);
 
+=======
+    
+    // Find the target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === toParticipantId);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     if (targetSocket) {
       io.to(targetSocket[0]).emit('answer', {
         fromParticipantId: sender.participantId,
@@ -218,11 +299,19 @@ io.on('connection', (socket) => {
   // WebRTC Signaling: ICE Candidate
   socket.on('ice-candidate', ({ meetingId, toParticipantId, candidate }) => {
     const sender = participants.get(socket.id);
+<<<<<<< HEAD
 
     // Find the target participant's socket
     const targetSocket = Array.from(participants.entries())
       .find(([_, p]) => p.participantId === toParticipantId);
 
+=======
+    
+    // Find the target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === toParticipantId);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     if (targetSocket) {
       io.to(targetSocket[0]).emit('ice-candidate', {
         fromParticipantId: sender.participantId,
@@ -235,7 +324,11 @@ io.on('connection', (socket) => {
   socket.on('chat-message', ({ meetingId, message }) => {
     const sender = participants.get(socket.id);
     console.log(`Chat message from ${sender?.participantName} in meeting ${meetingId}`);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Broadcast to all OTHER participants in the meeting (exclude sender)
     socket.to(meetingId).emit('chat-message', message);
   });
@@ -247,7 +340,11 @@ io.on('connection', (socket) => {
       // Update local state
       if (isAudioMuted !== undefined) participant.isAudioMuted = isAudioMuted;
       if (isVideoOff !== undefined) participant.isVideoOff = isVideoOff;
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Broadcast to all participants
       io.to(meetingId).emit('participant-state-changed', {
         participantId,
@@ -262,6 +359,7 @@ io.on('connection', (socket) => {
   socket.on('mute-participant', ({ meetingId, participantId }) => {
     const host = participants.get(socket.id);
     if (!host || !host.isHost) return;
+<<<<<<< HEAD
 
     console.log(`Host ${host.participantName} muting ${participantId}`);
 
@@ -276,6 +374,22 @@ io.on('connection', (socket) => {
       // Notify the participant they were muted
       io.to(targetSocketId).emit('muted-by-host');
 
+=======
+    
+    console.log(`Host ${host.participantName} muting ${participantId}`);
+    
+    // Find target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === participantId);
+    
+    if (targetSocket) {
+      const [targetSocketId, targetParticipant] = targetSocket;
+      targetParticipant.isAudioMuted = true;
+      
+      // Notify the participant they were muted
+      io.to(targetSocketId).emit('muted-by-host');
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Broadcast state change to all
       io.to(meetingId).emit('participant-state-changed', {
         participantId,
@@ -290,6 +404,7 @@ io.on('connection', (socket) => {
   socket.on('unmute-participant', ({ meetingId, participantId }) => {
     const host = participants.get(socket.id);
     if (!host || !host.isHost) return;
+<<<<<<< HEAD
 
     console.log(`Host ${host.participantName} unmuting ${participantId}`);
 
@@ -304,6 +419,22 @@ io.on('connection', (socket) => {
       // Notify the participant they were unmuted
       io.to(targetSocketId).emit('unmuted-by-host');
 
+=======
+    
+    console.log(`Host ${host.participantName} unmuting ${participantId}`);
+    
+    // Find target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === participantId);
+    
+    if (targetSocket) {
+      const [targetSocketId, targetParticipant] = targetSocket;
+      targetParticipant.isAudioMuted = false;
+      
+      // Notify the participant they were unmuted
+      io.to(targetSocketId).emit('unmuted-by-host');
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Broadcast state change to all
       io.to(meetingId).emit('participant-state-changed', {
         participantId,
@@ -318,6 +449,7 @@ io.on('connection', (socket) => {
   socket.on('remove-participant', ({ meetingId, participantId }) => {
     const host = participants.get(socket.id);
     if (!host || !host.isHost) return;
+<<<<<<< HEAD
 
     console.log(`Host ${host.participantName} removing ${participantId}`);
 
@@ -331,6 +463,21 @@ io.on('connection', (socket) => {
       // Notify the participant they were removed
       io.to(targetSocketId).emit('removed-by-host');
 
+=======
+    
+    console.log(`Host ${host.participantName} removing ${participantId}`);
+    
+    // Find target participant's socket
+    const targetSocket = Array.from(participants.entries())
+      .find(([_, p]) => p.participantId === participantId);
+    
+    if (targetSocket) {
+      const [targetSocketId] = targetSocket;
+      
+      // Notify the participant they were removed
+      io.to(targetSocketId).emit('removed-by-host');
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Force disconnect after a short delay
       setTimeout(() => {
         const targetSocketObj = io.sockets.sockets.get(targetSocketId);
@@ -350,7 +497,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
     const participant = participants.get(socket.id);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     if (participant) {
       handleParticipantLeave(socket, participant.meetingId, participant.participantId);
     }
@@ -359,6 +510,7 @@ io.on('connection', (socket) => {
 
 function handleParticipantLeave(socket, meetingId, participantId) {
   const participant = participants.get(socket.id);
+<<<<<<< HEAD
 
   if (participant) {
     console.log(`${participant.participantName} left meeting ${meetingId}`);
@@ -367,11 +519,18 @@ function handleParticipantLeave(socket, meetingId, participantId) {
     const isHost = participant.isHost;
     const participantNameLeaving = participant.participantName;
 
+=======
+  
+  if (participant) {
+    console.log(`${participant.participantName} left meeting ${meetingId}`);
+    
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
     // Notify others
     socket.to(meetingId).emit('participant-left', {
       participantId: participant.participantId,
       participantName: participant.participantName
     });
+<<<<<<< HEAD
 
     // If host is leaving, emit doctor-left event
     if (isHost) {
@@ -390,6 +549,16 @@ function handleParticipantLeave(socket, meetingId, participantId) {
     if (meetings.has(meetingId)) {
       meetings.get(meetingId).delete(socket.id);
 
+=======
+    
+    // Clean up
+    socket.leave(meetingId);
+    participants.delete(socket.id);
+    
+    if (meetings.has(meetingId)) {
+      meetings.get(meetingId).delete(socket.id);
+      
+>>>>>>> 2effb81b09470ede9c5149956a9cb0eacb2230fe
       // Remove meeting if empty
       if (meetings.get(meetingId).size === 0) {
         meetings.delete(meetingId);
