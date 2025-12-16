@@ -366,7 +366,7 @@ function handleParticipantLeave(socket, meetingId, participantId) {
         }
     }
 }
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8002;
 const HOST = process.env.HOST || '0.0.0.0';
 server.listen(PORT, HOST, () => {
     console.log(`🚀 WebRTC Signaling Server running on port ${PORT}`);
