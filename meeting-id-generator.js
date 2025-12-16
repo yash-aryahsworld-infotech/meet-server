@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // Secret key for encryption - should be in .env in production
 const SECRET_KEY = process.env.MEETING_SECRET_KEY || 'healthcare-plus-secret-key-2024';
@@ -9,7 +9,7 @@ const SECRET_KEY = process.env.MEETING_SECRET_KEY || 'healthcare-plus-secret-key
  * @param {string} appointmentId - The appointment ID
  * @returns {string} - Secure meeting ID (12 characters)
  */
-function generateMeetingId(appointmentId) {
+export const generateMeetingId = (appointmentId) => {
   // Create HMAC hash using appointment ID
   const hmac = crypto.createHmac('sha256', SECRET_KEY);
   hmac.update(appointmentId.toString());
@@ -27,7 +27,7 @@ function generateMeetingId(appointmentId) {
  * @param {string} appointmentId - The appointment ID to check against
  * @returns {boolean} - True if they match
  */
-function verifyMeetingId(meetingId, appointmentId) {
+export const verifyMeetingId = (meetingId, appointmentId) => {
   const expectedMeetingId = generateMeetingId(appointmentId);
   return meetingId.toUpperCase() === expectedMeetingId.toUpperCase();
 }
@@ -36,12 +36,8 @@ function verifyMeetingId(meetingId, appointmentId) {
  * Generate a completely random meeting ID (for meetings without appointment)
  * @returns {string} - Random meeting ID (12 characters)
  */
-function generateRandomMeetingId() {
+export const generateRandomMeetingId = () => {
   return crypto.randomBytes(6).toString('hex').toUpperCase();
 }
 
-module.exports = {
-  generateMeetingId,
-  verifyMeetingId,
-  generateRandomMeetingId
-};
+

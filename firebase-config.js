@@ -1,6 +1,9 @@
-const { initializeApp } = require("firebase/app");
-const { getDatabase, ref, set, update, remove } = require("firebase/database");
-const dotenv = require("dotenv");
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, update, remove } from "firebase/database";
+import dotenv from "dotenv";
+
+
+
 dotenv.config();
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -20,7 +23,7 @@ console.log("🔥 Firebase Client (Realtime DB) Connected");
  * Store meeting data in the NEW consolidated structure
  * Path: healthcare/meetings/{appointmentId}/metadata
  */
-async function storeMeetingData(meetingId, appointmentId = null) {
+export const storeMeetingData = async (meetingId, appointmentId = null) => {
     try {
         if (!appointmentId) {
             console.warn('⚠️ No appointmentId provided, skipping meeting data storage');
@@ -48,7 +51,7 @@ async function storeMeetingData(meetingId, appointmentId = null) {
  * Store call start information
  * Path: healthcare/meetings/{appointmentId}/call
  */
-async function storeCallData(appointmentId, callData) {
+export const storeCallData = async (appointmentId, callData) => {
     try {
         if (!appointmentId) {
             console.warn('⚠️ No appointmentId provided for call data');
@@ -74,7 +77,7 @@ async function storeCallData(appointmentId, callData) {
 /**
  * Update call status
  */
-async function updateCallStatus(appointmentId, status) {
+export const updateCallStatus = async (appointmentId, status) => {
     try {
         if (!appointmentId) return false;
         const callRef = ref(db, `healthcare/meetings/${appointmentId}/call`);
@@ -92,7 +95,7 @@ async function updateCallStatus(appointmentId, status) {
 /**
  * Remove call data (cleanup)
  */
-async function removeCallData(appointmentId) {
+export const removeCallData = async (appointmentId) => {
     try {
         if (!appointmentId) return false;
         const callRef = ref(db, `healthcare/meetings/${appointmentId}/call`);
@@ -104,11 +107,3 @@ async function removeCallData(appointmentId) {
         return false;
     }
 }
-module.exports = {
-    app,
-    db,
-    storeMeetingData,
-    storeCallData,
-    updateCallStatus,
-    removeCallData
-};

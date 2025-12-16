@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "WebRTC signaling server for healthcare video calls",
   "main": "server.js",
+  "type":"module",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
   "keywords": [

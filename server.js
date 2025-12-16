@@ -1,21 +1,34 @@
-const express = require('express');
-const http = require('http');
-const socketIO = require('socket.io');
-const cors = require('cors');
-const { storeMeetingData, storeCallData, updateCallStatus } = require('./firebase-config.js');
-const { generateMeetingId, verifyMeetingId } = require('./meeting-id-generator.js');
+import express from "express";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
+import cors from "cors";
+
+import {
+  storeMeetingData,
+  storeCallData,
+  updateCallStatus
+} from "./firebase-config.js";
+
+import {
+  generateMeetingId,
+  verifyMeetingId
+} from "./meeting-id-generator.js";
+
 const app = express();
 const server = http.createServer(app);
+
 // Configure CORS
 app.use(cors());
 app.use(express.json());
+
 // Socket.IO setup with CORS
-const io = socketIO(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
 });
+
 // Store active meetings and participants
 const meetings = new Map();
 const participants = new Map();
